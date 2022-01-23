@@ -1,0 +1,593 @@
+{% macro renderDishForm(dishForm) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('postDish') }}">
+            {{ dishForm.csrf_token }}
+            <div class="form-group">
+                <div class="form-floating mb-3">
+                    {{ dishForm.name }}
+                    {{ dishForm.name.label }}
+                </div>
+                <div class="form-floating">
+                    {{ dishForm.introduction }}
+                    {{ dishForm.introduction.label }}
+                </div>
+
+                <div class="input-group mb-3" style="margin-top:15px;">
+                    <label class="input-group-text" for="inputGroupFile01">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
+                          <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"></path>
+                          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"></path>
+                        </svg>
+                    </span>
+                    </label>
+                    {{ dishForm.imageLoad }}
+                </div>
+                {{ dishForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro renderFoodForm(foodForm, dishId) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" class="row row-cols-lg-auto g-3 align-items-center" action="{{ url_for('postFood', dishId=dishId) }}" id="fm">
+            {{ foodForm.csrf_token }}
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.name }}
+                    {{ foodForm.name.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.quantityDemand }}
+                    {{ foodForm.quantityDemand.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.unit }}
+                    {{ foodForm.unit.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    {{ foodForm.isNecessary }}
+                    {{ foodForm.isNecessary.label(class_='form-check-label') }}
+                </div>
+            </div>
+            <div class="col-12">
+                {{ foodForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro renderEditFoodForm(foodForm) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" class="row row-cols-lg-auto g-3 align-items-center" action="{{ url_for('editFood') }}">
+            {{ foodForm.csrf_token }}
+            <div class="col-12" style="display:none;">
+                <div class="form-floating mb-3">
+                    {{ foodForm.foodId }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.name }}
+                    {{ foodForm.name.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.quantityDemand }}
+                    {{ foodForm.quantityDemand.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.unit }}
+                    {{ foodForm.unit.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    {{ foodForm.isNecessary }}
+                    {{ foodForm.isNecessary.label(class_='form-check-label') }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                {{ foodForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+
+{% macro dishCard(dish, deleteDishForm) %}
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="{{ dish.imageUrl }}" class="img-fluid rounded-start rounded-3" alt="...">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h2 class="card-title display-3">
+                    {{ dish.name }}
+                    {% if dish.isAvailable %}
+                        {{ successfulSpan() }}
+                    {% else %}
+                        {{ unsuccessfulSpan() }}
+                    {% endif %}
+                    <div class="btn-group float-end">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            编辑
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item text-success" href="{{ url_for('editDish', dishId=dish.id) }}">更新</a></li>
+                            <li>
+                                <form method="post" action="{{ url_for('deleteDish',dishId=dish.id) }}">
+                                    {{ deleteDishForm.csrf_token }}
+                                    {{ deleteDishForm.submit }}
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </h2>
+                <br>
+                <p class="card-text">{{ dish.introduction }}</p>
+                <p class="card-text"><small class="text-muted">最后更新于:&nbsp;{{ dish.lastEdit.strftime('%Y/%m/%d %H:%M') }}</small></p>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro foodTable(dish, deleteFoodForm) %}
+    <div id="collapseOne2" class="accordion-collapse collapse show" aria-labelledby="headingOne2" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <table class="table table-sm" id="fdt">
+                <thead>
+                <tr>
+                    <th scope="col">食材</th>
+                    {#                    <th scope="col">所需量</th>#}
+                    <th scope="col">必须</th>
+                    <th scope="col">达标</th>
+                    <th scope="col">编辑</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for food in dish.foods %}
+                    <tr>
+                        <td>{{ food.name }}</td>
+                        {#                        <td>{{ food.quantityDemand }}{{ food.unit }}</td>#}
+                        <td>
+                            {% if food.isNecessary %}
+                                {{ successfulSpan() }}
+                            {% else %}
+                                {{ unsuccessfulSpan() }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if food.isAvailable %}
+                                {{ successfulSpan() }}
+                            {% else %}
+                                {{ unsuccessfulSpan() }}
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    编辑
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                    <li><button class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
+                                                data-bs-name="{{ food.name }}"
+                                                data-bs-dm="{{ food.quantityDemand }}"
+                                                data-bs-un="{{ food.unit }}"
+                                                data-bs-isNes="{{ food.isNecessary }}"
+                                                data-bs-foodId="{{ food.id }}">更新</button></li>
+                                    <li>
+                                        <form method="post" action="{{ url_for('deleteFood', foodId=food.id) }}">
+                                            {{ deleteFoodForm.csrf_token }}
+                                            {{ deleteFoodForm.submit }}
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro successfulSpan() %}
+    {#    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg text-success" viewBox="0 0 16 16">#}
+    {#        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"></path>#}
+    {#    </svg>#}
+    ✅
+{% endmacro %}
+
+{% macro unsuccessfulSpan() %}
+    {#    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg text-danger" viewBox="0 0 16 16">#}
+    {#        <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"></path>#}
+    {#        <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"></path>#}
+    {#    </svg>#}
+    ❌
+{% endmacro %}
+
+{% macro genModal(editFoodForm) %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title display-5 text-success" id="exampleModalLabel">更新</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ renderEditFoodForm(editFoodForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const exampleModal = document.getElementById('exampleModal');
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            const name = button.getAttribute('data-bs-name');
+            const dm = button.getAttribute('data-bs-dm');
+            const un = button.getAttribute('data-bs-un');
+            const isNes = button.getAttribute('data-bs-isNes');
+            const foodId = button.getAttribute('data-bs-foodId');
+            // If necessary, you could initiate an AJAX request here
+            // and then do the updating in a callback.
+            //
+            // Update the modal's content.
+            const modalnameInput = exampleModal.querySelector("#name");
+            const modaldmInput = exampleModal.querySelector("#quantityDemand");
+            const modalunInput = exampleModal.querySelector("#unit");
+            const modalIsNesInput = exampleModal.querySelector("#isNecessary");
+            const modalFoodIdInput = exampleModal.querySelector("#foodId");
+
+            modalnameInput.value = name
+            modaldmInput.value = dm
+            modalunInput.value = un
+            modalFoodIdInput.value = foodId
+            modalIsNesInput.checked = isNes === "True";
+
+        })
+    </script>
+{% endmacro %}
+
+{% macro dishCardUpperPart(dish) %}
+    <a href="{{ url_for('postFood', dishId=dish.id) }}" style="color: black; text-decoration: none;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ dish.imageUrl }}" class="img-fluid rounded-start rounded-3" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title display-6">
+                        {{ dish.name }}
+                        {% if dish.isAvailable %}
+                            {{ successfulSpan() }}
+                        {% else %}
+                            {{ unsuccessfulSpan() }}
+                        {% endif %}
+                    </h2>
+                    <br>
+                    <p class="card-text">{{ dish.introduction }}</p>
+                    <p class="card-text"><small class="text-muted">最后更新于:&nbsp;{{ dish.lastEdit.strftime('%Y/%m/%d %H:%M') }}</small></p>
+                </div>
+            </div>
+        </div>
+    </a>
+
+{% endmacro %}
+
+{% macro dishCardTablePart(dish, index) %}
+    <div class="accordion accordion-flush">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="{{ inedx }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ dish.name }}" aria-expanded="true" aria-controls="{{ index }}">
+                    食材详情
+                </button>
+            </h2>
+            <div id="{{ dish.name }}" class="accordion-collapse collapse" aria-labelledby="{{ dish.name }}" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th scope="col">食材</th>
+                            <th scope="col">必须</th>
+                            <th scope="col">达标</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for food in dish.foods %}
+                            <tr>
+                                <td>{{ food.name }}</td>
+                                <td>
+                                    {% if food.isNecessary %}
+                                        {{ successfulSpan() }}
+                                    {% else %}
+                                        {{ unsuccessfulSpan() }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if food.isAvailable %}
+                                        {{ successfulSpan() }}
+                                    {% else %}
+                                        {{ unsuccessfulSpan() }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro dishCardForIndex(dish, index) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        {{ dishCardUpperPart(dish) }}
+        <br>
+        {{ dishCardTablePart(dish, index) }}
+    </div>
+{% endmacro %}
+
+
+{% macro dishImagePlay(dishes) %}
+    <div id="carouselExampleCaptions" class="carousel slide carousel-fade shadow-lg p-2 mb-3 bg-body rounded-3" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            {% for dish in dishes %}
+                {% if loop.index0 == 0 %}
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                {% else %}
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ loop.index0 }}" aria-label="Slide {{ loop.index }}"></button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="carousel-inner">
+            {% for dish in dishes %}
+                {% if loop.index0 == 0 %}
+                    <div class="carousel-item active">
+                        <a href="{{ url_for('postFood', dishId=dish.id) }}">
+                            <img src="{{ dish.imageUrl }}" class="d-block w-100 rounded-3" alt="..." >
+                        </a>
+                        <div class="carousel-caption d-md-block">
+                            <div class="bg-white p-2 text-dark bg-opacity-75 rounded-3">
+                                <h1 class="display-6">{{ dish.name }}</h1>
+                                <p>{{ dish.introduction }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="carousel-item">
+                        <a href="{{ url_for('postFood', dishId=dish.id) }}">
+                            <img src="{{ dish.imageUrl }}" class="d-block w-100 rounded-3" alt="..." >
+                        </a>
+                        <div class="carousel-caption d-md-block">
+                            <div class="bg-white p-2 text-dark bg-opacity-75 rounded-3">
+                                <h1 class="display-6">
+                                    {{ dish.name }}
+                                </h1>
+                                <p>{{ dish.introduction }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+{% endmacro %}
+
+
+{% macro foodTableForHome(allFood, deleteFoodFormForHome) %}
+    <div id="collapseOne2" class="accordion-collapse collapse show" aria-labelledby="headingOne2" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <table class="table table-sm" id="fdt">
+                <thead>
+                <tr>
+                    <th scope="col">食材</th>
+                    <th scope="col">食材量</th>
+                    <th scope="col">编辑</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for food in allFood %}
+                    <tr>
+                        <td>{{ food.name }}</td>
+                        <td>
+                            {{ food.quantity }}{{ food.unit }}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    编辑
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                    <li><button class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
+                                                data-bs-name="{{ food.name }}"
+                                                data-bs-dm="{{ food.quantity }}"
+                                                data-bs-un="{{ food.unit }}"
+                                                data-bs-foodId="{{ food.id }}">更新</button></li>
+                                    <li>
+                                        <form method="post" action="{{ url_for('deleteHomeFood', foodId=food.id) }}">
+                                            {{ deleteFoodFormForHome.csrf_token }}
+                                            {{ deleteFoodFormForHome.submit }}
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro genModalForHome(editFoodFormForHome) %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title display-5 text-success" id="exampleModalLabel">更新</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ renderEditFoodFormForHome(editFoodFormForHome) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const exampleModal = document.getElementById('exampleModal');
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const name = button.getAttribute('data-bs-name');
+            const dm = button.getAttribute('data-bs-dm');
+            const un = button.getAttribute('data-bs-un');
+            const foodId = button.getAttribute('data-bs-foodId');
+
+            const modalnameInput = exampleModal.querySelector("#name");
+            const modaldmInput = exampleModal.querySelector("#quantity");
+            const modalunInput = exampleModal.querySelector("#unit");
+            const modalFoodIdInput = exampleModal.querySelector("#foodId");
+
+            modalnameInput.value = name
+            modaldmInput.value = dm
+            modalunInput.value = un
+            modalFoodIdInput.value = foodId
+        })
+    </script>
+{% endmacro %}
+
+{% macro renderEditFoodFormForHome(foodForm) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" class="row row-cols-lg-auto g-3 align-items-center" action="{{ url_for('editFoodForHome') }}">
+            {{ foodForm.csrf_token }}
+            <div class="col-12" style="display:none;">
+                <div class="form-floating mb-3">
+                    {{ foodForm.foodId }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.name }}
+                    {{ foodForm.name.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.quantity }}
+                    {{ foodForm.quantity.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.unit }}
+                    {{ foodForm.unit.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                {{ foodForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro renderFoodFormForHome(foodForm) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" class="row row-cols-lg-auto g-3 align-items-center" action="{{ url_for('postFoodForHome') }}" id="fm">
+            {{ foodForm.csrf_token }}
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.name }}
+                    {{ foodForm.name.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.quantity }}
+                    {{ foodForm.quantity.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating mb-3">
+                    {{ foodForm.unit }}
+                    {{ foodForm.unit.label }}
+                </div>
+            </div>
+
+            <div class="col-12">
+                {{ foodForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro renderEditDishForm(dishForm, dishId) %}
+    <div class="card mb-3 shadow-lg p-2 mb-3 bg-body rounded-3">
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('editDish', dishId=dishId) }}">
+            {{ dishForm.csrf_token }}
+            <div class="form-group">
+                <div class="form-floating mb-3">
+                    {{ dishForm.name }}
+                    {{ dishForm.name.label }}
+                </div>
+                <div class="form-floating">
+                    {{ dishForm.introduction }}
+                    {{ dishForm.introduction.label }}
+                </div>
+
+                <div class="input-group mb-3" style="margin-top:15px;">
+                    <label class="input-group-text" for="inputGroupFile01">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
+                          <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"></path>
+                          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"></path>
+                        </svg>
+                    </span>
+                    </label>
+                    {{ dishForm.imageLoad }}
+                </div>
+                {{ dishForm.submit }}
+            </div>
+        </form>
+    </div>
+{% endmacro %}

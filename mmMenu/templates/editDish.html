@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% from "macros.html" import renderEditDishForm %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <br>
+                {{ renderEditDishForm(dishForm, dishId=dishId) }}
+                <br>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+{% endblock %}

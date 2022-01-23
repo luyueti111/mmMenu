@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from "macros.html" import dishCardForIndex %}
+{% from "macros.html" import dishImagePlay %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {{ dishImagePlay(dishes) }}
+{#                <a href="{{ url_for('postDish') }}" style="text-decoration: none;">#}
+{#                    <button class="btn btn-outline-primary mb-2 p-2" type="button">添加菜单</button>#}
+{#                </a>#}
+{#                <a href="{{ url_for('avaDishes') }}" style="text-decoration: none;">#}
+{#                    <button class="btn btn-outline-primary mb-2 p-2" type="button">目前可做</button>#}
+{#                </a>#}
+{#                <a href="{{ url_for('homeFood') }}" style="text-decoration: none;">#}
+{#                    <button class="btn btn-outline-primary mb-2 p-2" type="button">更新现有食材</button>#}
+{#                </a>#}
+
+
+                {% for dish in dishes %}
+                    {{ dishCardForIndex(dish, loop.revindex) }}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+{% endblock %}
